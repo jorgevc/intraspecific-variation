@@ -11,7 +11,6 @@ Welcome to interindividual niche variations's documentation!
    :caption: Contents:
    
    modules
-   species
    resourcespetialitation
 
 
