@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>resourcespetialitation module &#8212; interindividual niche variations  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="ResourceSpecializationSim" href="modules.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-resourcespetialitation">
+<span id="resourcespetialitation-module"></span><h1>resourcespetialitation module<a class="headerlink" href="#module-resourcespetialitation" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="resourcespetialitation.gaussian">
+<code class="descclassname">resourcespetialitation.</code><code class="descname">gaussian</code><span class="sig-paren">(</span><em>x</em>, <em>mu</em>, <em>var</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of evaluating a gaussian <cite>exp((x-mu)^{2}/2var^{2})</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="resourcespetialitation.gaussianSpecialization">
+<code class="descclassname">resourcespetialitation.</code><code class="descname">gaussianSpecialization</code><span class="sig-paren">(</span><em>NoResources</em>, <em>variance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#gaussianSpecialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.gaussianSpecialization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a np array representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>NoResources</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Width of the distribution</li>
+<li><strong>variance</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Variance of the gaussian distribution</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="resourcespetialitation.generatePopulation">
+<code class="descclassname">resourcespetialitation.</code><code class="descname">generatePopulation</code><span class="sig-paren">(</span><em>species</em>, <em>NoIndividuals</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#generatePopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.generatePopulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of individuals of a given species</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>species</strong> (<a class="reference internal" href="#resourcespetialitation.species" title="resourcespetialitation.species"><em>species</em></a>) &#8211; the species of the generated individuals</li>
+<li><strong>NoIndividuals</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of individuals to be generated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of individuals</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)">list</a>[<a class="reference internal" href="#resourcespetialitation.individual" title="resourcespetialitation.individual">individual</a>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="resourcespetialitation.individual">
+<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">individual</code><span class="sig-paren">(</span><em>species</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#individual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.individual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a single individual</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>species</strong> (<a class="reference internal" href="#resourcespetialitation.species" title="resourcespetialitation.species"><em>species</em></a>) &#8211; the specie of the indiviudal to be instanced</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/2/library/resource.html#module-resource" title="(in Python v2.7)"><strong>resource</strong></a> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; the resource specialitation of this individual</li>
+<li><a class="reference internal" href="#resourcespetialitation.species" title="resourcespetialitation.species"><strong>species</strong></a> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Its species id</li>
+<li><strong>place_in_list</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; place (index) in the list resourceSpace.individuals</li>
+<li><strong>place_in_resource</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; index in list resourceSpace.space[resource][index] where the individual is located</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="resourcespetialitation.resourceSpace">
+<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">resourceSpace</code><span class="sig-paren">(</span><em>NoResources</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#resourceSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.resourceSpace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represent the resource space where individuals are</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>NoResources</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Size of the space</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>NoResources</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; size of the resources space</li>
+<li><strong>space</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference internal" href="#resourcespetialitation.individual" title="resourcespetialitation.individual"><em>individual</em></a><em>]</em><em></em><em>]</em><em></em>) &#8211; list of list. The position in the list represent the resource, the list there is a list
+of individuals with that specialization.</li>
+<li><strong>capacity</strong> (<a class="reference external" href="https://docs.python.org/2/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>]</em><em></em>) &#8211; array indicating the maximun number of individuals allowed per resource</li>
+<li><strong>individuals</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference internal" href="#resourcespetialitation.species" title="resourcespetialitation.species"><em>species</em></a><em>]</em><em></em>) &#8211; Unordered list of individuals in the resource space</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="resourcespetialitation.resourceSpace.InsertIndividual">
+<code class="descname">InsertIndividual</code><span class="sig-paren">(</span><em>Individual</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#resourceSpace.InsertIndividual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.resourceSpace.InsertIndividual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts an Individual in the resources space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Individual</strong> (<a class="reference internal" href="#resourcespetialitation.individual" title="resourcespetialitation.individual"><em>individual</em></a>) &#8211; Individual to be inserted</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.resourceSpace.InsertPopulation">
+<code class="descname">InsertPopulation</code><span class="sig-paren">(</span><em>Population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#resourceSpace.InsertPopulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.resourceSpace.InsertPopulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts a Population in the resources space</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Population</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference internal" href="#resourcespetialitation.individual" title="resourcespetialitation.individual"><em>individual</em></a><em>]</em><em></em>) &#8211; The population to be inserted</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.resourceSpace.KillIndividual">
+<code class="descname">KillIndividual</code><span class="sig-paren">(</span><em>Individual</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#resourceSpace.KillIndividual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.resourceSpace.KillIndividual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Eliminate the Individual from resource space.
+The Individual should previously habe been inserted with InsertIndividual(Individual)
+for this to work.
+A list of the inserted Individuals is in self.individuals</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>Individual</strong> (<a class="reference internal" href="#resourcespetialitation.individual" title="resourcespetialitation.individual"><em>individual</em></a>) &#8211; The individual to be eliminate</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.resourceSpace.bindResoucesCapacity">
+<code class="descname">bindResoucesCapacity</code><span class="sig-paren">(</span><em>ResourcesCapacity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#resourceSpace.bindResoucesCapacity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.resourceSpace.bindResoucesCapacity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bind the array characterizing the capacity of each resource to the instance of resourceSpace</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ResourcesCapacity</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>) or </em><em>numpy.array</em><em>(</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>)</em><em></em>) &#8211; The array of capacities of the resources. Should be the same size or larger 
+than the size of the resource space size</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="resourcespetialitation.species">
+<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">species</code><span class="sig-paren">(</span><em>birthR</em>, <em>deadR</em>, <em>mainResource</em>, <em>ResourceSpecialization</em>, <em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.species" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a species</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">param birthR:</th><td class="field-body">Birth rate of species&#8217;s individuals</td>
+</tr>
+<tr class="field-even field"><th class="field-name">param deadR:</th><td class="field-body">Dead rate of species&#8217;s individuals</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">param mainResource:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">the central resouce of the specie</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">param ResourceSpecialization:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Distribution of resource variation around the mainResource</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">param id:</th><td class="field-body">id of the specie</td>
+</tr>
+<tr class="field-even field"><th class="field-name">type birthR:</th><td class="field-body">float</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">type deadR:</th><td class="field-body">float</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">type mainResource:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">int</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">type ResourceSpecialization:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">array[float]</td>
+</tr>
+<tr class="field-even field"><th class="field-name">type id:</th><td class="field-body">int</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">return:</th><td class="field-body">objet describing a species</td>
+</tr>
+<tr class="field-even field"><th class="field-name">rtype:</th><td class="field-body">species</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<dl class="method">
+<dt id="resourcespetialitation.species.bindSpecialitation">
+<code class="descname">bindSpecialitation</code><span class="sig-paren">(</span><em>mainResource</em>, <em>ResourceSpecialization</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#species.bindSpecialitation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.species.bindSpecialitation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relocates the resource spetialitation distribution to a absolute position
+where the mainResource is in the center of the distribution given by Resourcespecialization</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mainResource</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; location of the Resouce distribution</li>
+<li><strong>ResourceSpecialization</strong> (<a class="reference external" href="https://docs.python.org/2/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>]</em><em></em>) &#8211; distribution of specialization</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">array of float representing the resource specialitation in absolute position</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/array.html#module-array" title="(in Python v2.7)">array</a>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.species.makePartition">
+<code class="descname">makePartition</code><span class="sig-paren">(</span><em>ResourceSpecialization</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#species.makePartition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.species.makePartition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of cumulative probability of the Resoucespecialization distribution</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ResourceSpecialization</strong> (<a class="reference external" href="https://docs.python.org/2/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>]</em><em></em>) &#8211; Discreate distribution representing the variability of resources specialitation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Discreate cumulative probability</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/array.html#module-array" title="(in Python v2.7)">array</a>[<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a>]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">ResourceSpecializationSim</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">ResourceSpecializationSim</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/resourcespetialitation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jorge Velazquez-Castro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/resourcespetialitation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

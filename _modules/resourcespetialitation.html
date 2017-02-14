@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>resourcespetialitation &#8212; interindividual niche variations  documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for resourcespetialitation</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<div class="viewcode-block" id="species"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.species">[docs]</a><span class="k">class</span> <span class="nc">species</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Represents a species</span>
+<span class="sd">		</span>
+<span class="sd">		:param birthR: Birth rate of species&#39;s individuals</span>
+<span class="sd">		:param deadR: Dead rate of species&#39;s individuals</span>
+<span class="sd">		:param mainResource: the central resouce of the specie</span>
+<span class="sd">		:param ResourceSpecialization: Distribution of resource variation around the mainResource</span>
+<span class="sd">		:param id: id of the specie</span>
+<span class="sd">		:type birthR: float</span>
+<span class="sd">		:type deadR: float</span>
+<span class="sd">		:type mainResource: int</span>
+<span class="sd">		:type ResourceSpecialization: array[float]</span>
+<span class="sd">		:type id: int</span>
+<span class="sd">		:return: objet describing a species</span>
+<span class="sd">		:rtype: species</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">birthR</span><span class="p">,</span><span class="n">deadR</span><span class="p">,</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">,</span><span class="nb">id</span><span class="p">):</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">birthR</span> <span class="o">=</span> <span class="n">birthR</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">deadR</span> <span class="o">=</span> <span class="n">deadR</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ResourceSpecialization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bindSpecialitation</span><span class="p">(</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">mainResource</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">partition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makePartition</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span>
+
+<div class="viewcode-block" id="species.bindSpecialitation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.species.bindSpecialitation">[docs]</a>	<span class="k">def</span> <span class="nf">bindSpecialitation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">):</span> <span class="c1">#to deprecate ?</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Relocates the resource spetialitation distribution to a absolute position</span>
+<span class="sd">		where the mainResource is in the center of the distribution given by Resourcespecialization</span>
+<span class="sd">		</span>
+<span class="sd">		:param mainResource: location of the Resouce distribution</span>
+<span class="sd">		:param ResourceSpecialization: distribution of specialization</span>
+<span class="sd">		:type mainResource: int</span>
+<span class="sd">		:type ResourceSpecialization: array[float]</span>
+<span class="sd">		:return: array of float representing the resource specialitation in absolute position</span>
+<span class="sd">		:rtype: array[float]</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="n">specialitation</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">mid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)):</span>
+			<span class="k">if</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="n">mid</span> <span class="o">&gt;=</span> <span class="n">mainResource</span> <span class="ow">and</span> <span class="n">i</span> <span class="o">+</span> <span class="n">mid</span> <span class="o">-</span> <span class="n">mainResource</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)):</span>
+				<span class="n">specialitation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">mid</span> <span class="o">-</span> <span class="n">mainResource</span><span class="p">])</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">specialitation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">specialitation</span><span class="p">)</span></div>
+		
+<div class="viewcode-block" id="species.makePartition"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.species.makePartition">[docs]</a>	<span class="k">def</span> <span class="nf">makePartition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ResourceSpecialization</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Returns an array of cumulative probability of the Resoucespecialization distribution</span>
+<span class="sd">		</span>
+<span class="sd">		:param ResourceSpecialization: Discreate distribution representing the variability of resources specialitation</span>
+<span class="sd">		:type ResourceSpecialization: array[float]</span>
+<span class="sd">		:return: Discreate cumulative probability</span>
+<span class="sd">		:rtype: array[float]</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">partition</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)):</span>
+			<span class="n">cumulative</span> <span class="o">=</span> <span class="n">partition</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ResourceSpecialization</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+			<span class="n">partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cumulative</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">partition</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="gaussian"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.gaussian">[docs]</a><span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Returns the value of evaluating a gaussian `exp((x-mu)^{2}/2var^{2})`</span>
+<span class="sd">	</span>
+<span class="sd">	:type x: float</span>
+<span class="sd">	:type mu: float</span>
+<span class="sd">	:type var: float</span>
+<span class="sd">	:rtype: float</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="gaussianSpecialization"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.gaussianSpecialization">[docs]</a><span class="k">def</span> <span class="nf">gaussianSpecialization</span><span class="p">(</span><span class="n">NoResources</span><span class="p">,</span><span class="n">variance</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Returns a np array representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.</span>
+<span class="sd">	</span>
+<span class="sd">	:param NoResources: Width of the distribution</span>
+<span class="sd">	:param variance: Variance of the gaussian distribution</span>
+<span class="sd">	:type NoResources: int</span>
+<span class="sd">	:type variance: float</span>
+<span class="sd">	:rtype: np array</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">SpeciesResourceSpecialization</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span>
+	<span class="n">mu</span> <span class="o">=</span> <span class="p">((</span><span class="n">NoResources</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">NoResources</span><span class="p">):</span>
+		<span class="n">SpeciesResourceSpecialization</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">variance</span><span class="p">)</span> <span class="o">+</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">variance</span><span class="p">))</span><span class="o">/</span><span class="mf">2.0</span>
+	<span class="n">SpeciesResourceSpecialization</span> <span class="o">=</span> <span class="n">SpeciesResourceSpecialization</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">SpeciesResourceSpecialization</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">SpeciesResourceSpecialization</span></div>
+
+<div class="viewcode-block" id="resourceSpace"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace">[docs]</a><span class="k">class</span> <span class="nc">resourceSpace</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Represent the resource space where individuals are</span>
+<span class="sd">	</span>
+<span class="sd">	:param NoResources: Size of the space</span>
+<span class="sd">	:type NoResources: int</span>
+<span class="sd">	</span>
+<span class="sd">	:var NoResources: size of the resources space</span>
+<span class="sd">	:vartype NoResources: int</span>
+<span class="sd">	:var space: list of list. The position in the list represent the resource, the list there is a list</span>
+<span class="sd">	 of individuals with that specialization.</span>
+<span class="sd">	:vartype space: list[list[individual]]</span>
+<span class="sd">	:var capacity: array indicating the maximun number of individuals allowed per resource</span>
+<span class="sd">	:vartype capacity: array[int]</span>
+<span class="sd">	:var individuals: Unordered list of individuals in the resource space</span>
+<span class="sd">	:vartype individuals: list[species]</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">NoResources</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span> <span class="o">=</span> <span class="n">NoResources</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span> <span class="o">=</span> <span class="p">[]</span>
+		
+<div class="viewcode-block" id="resourceSpace.InsertPopulation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.InsertPopulation">[docs]</a>	<span class="k">def</span> <span class="nf">InsertPopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Population</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Inserts a Population in the resources space</span>
+<span class="sd">		</span>
+<span class="sd">		:param Population: The population to be inserted</span>
+<span class="sd">		:type Population: list[individual]</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="k">for</span> <span class="n">Individual</span> <span class="ow">in</span> <span class="n">Population</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">InsertIndividual</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span></div>
+			
+<div class="viewcode-block" id="resourceSpace.InsertIndividual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.InsertIndividual">[docs]</a>	<span class="k">def</span> <span class="nf">InsertIndividual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Individual</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Inserts an Individual in the resources space</span>
+<span class="sd">		</span>
+<span class="sd">		:param Individual: Individual to be inserted</span>
+<span class="sd">		:type Individual: individual</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]):</span>
+			<span class="n">Individual</span><span class="o">.</span><span class="n">place_in_list</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">)</span>
+			<span class="n">Individual</span><span class="o">.</span><span class="n">place_in_resource</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">])</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span></div>
+			
+<div class="viewcode-block" id="resourceSpace.KillIndividual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.KillIndividual">[docs]</a>	<span class="k">def</span> <span class="nf">KillIndividual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Individual</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Eliminate the Individual from resource space.</span>
+<span class="sd">		The Individual should previously habe been inserted with InsertIndividual(Individual)</span>
+<span class="sd">		for this to work.</span>
+<span class="sd">		A list of the inserted Individuals is in self.individuals</span>
+<span class="sd">		</span>
+<span class="sd">		:param Individual: The individual to be eliminate</span>
+<span class="sd">		:type Individual: individual</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resouce</span><span class="p">][</span><span class="n">Individual</span><span class="o">.</span><span class="n">place_in_resource</span><span class="p">]</span>
+		<span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">place_in_list</span><span class="p">]</span></div>
+		
+<div class="viewcode-block" id="resourceSpace.bindResoucesCapacity"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.bindResoucesCapacity">[docs]</a>	<span class="k">def</span> <span class="nf">bindResoucesCapacity</span><span class="p">(</span><span class="n">ResourcesCapacity</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Bind the array characterizing the capacity of each resource to the instance of resourceSpace</span>
+<span class="sd">		</span>
+<span class="sd">		:param ResourcesCapacity: The array of capacities of the resources. Should be the same size or larger </span>
+<span class="sd">			than the size of the resource space size</span>
+<span class="sd">		:type ResourcesCapacity: list(int) or numpy.array(int)</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ResourcesCapacity</span><span class="p">)</span></div></div>
+				
+<div class="viewcode-block" id="individual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.individual">[docs]</a><span class="k">class</span> <span class="nc">individual</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Represents a single individual</span>
+<span class="sd">	</span>
+<span class="sd">	:param species: the specie of the indiviudal to be instanced</span>
+<span class="sd">	:type species: species</span>
+<span class="sd">	:var resource: the resource specialitation of this individual</span>
+<span class="sd">	:vartype resource: int</span>
+<span class="sd">	:var species: Its species id</span>
+<span class="sd">	:vartype species: int</span>
+<span class="sd">	:var place_in_list: place (index) in the list resourceSpace.individuals</span>
+<span class="sd">	:vartype place_in_list: int</span>
+<span class="sd">	:var place_in_resource: index in list resourceSpace.space[resource][index] where the individual is located</span>
+<span class="sd">	:vartype place_in_resource: int</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species</span><span class="p">):</span>
+		<span class="n">partLenght</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">species</span><span class="o">.</span><span class="n">partition</span><span class="p">)</span>
+		<span class="n">rdN</span> <span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="n">species</span><span class="o">.</span><span class="n">partition</span><span class="p">[</span><span class="n">partLenght</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">partLenght</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">rdN</span> <span class="o">&lt;=</span> <span class="n">species</span><span class="o">.</span><span class="n">partition</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+				<span class="n">resource</span> <span class="o">=</span> <span class="n">i</span>
+				<span class="k">break</span>
+		<span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span> <span class="o">+</span> <span class="n">species</span><span class="o">.</span><span class="n">offset</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">id</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">place_in_list</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">place_in_resource</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="generatePopulation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.generatePopulation">[docs]</a><span class="k">def</span> <span class="nf">generatePopulation</span><span class="p">(</span> <span class="n">species</span><span class="p">,</span> <span class="n">NoIndividuals</span> <span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Returns a list of individuals of a given species</span>
+<span class="sd">	</span>
+<span class="sd">	:param species: the species of the generated individuals</span>
+<span class="sd">	:type species: species</span>
+<span class="sd">	:param NoIndividuals: Number of individuals to be generated</span>
+<span class="sd">	:type NoIndividuals: int</span>
+<span class="sd">	:return: A list of individuals</span>
+<span class="sd">	:rtype: list[individual]</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="n">population</span> <span class="o">=</span> <span class="p">[]</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoIndividuals</span><span class="p">):</span>
+		<span class="n">Individual</span> <span class="o">=</span> <span class="n">individual</span><span class="p">(</span><span class="n">species</span><span class="p">)</span>
+		<span class="n">population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">population</span></div>
+		
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Jorge Velazquez-Castro.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
