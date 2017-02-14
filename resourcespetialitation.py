@@ -164,7 +164,7 @@ class resourceSpace:
 		Bind the array characterizing the capacity of each resource to the instance of resourceSpace
 		
 		:param ResourcesCapacity: The array of capacities of the resources. Should be the same size or larger 
-		than the size of the resource space size
+			than the size of the resource space size
 		:type ResourcesCapacity: list(int) or numpy.array(int)
 		"""
 		
@@ -176,11 +176,10 @@ class individual:
 	
 	:param species: the specie of the indiviudal to be instanced
 	:type species: species
-	
 	:var resource: the resource specialitation of this individual
 	:vartype resource: int
 	:var species: Its species id
-	:vartype species : int
+	:vartype species: int
 	:var place_in_list: place (index) in the list resourceSpace.individuals
 	:vartype place_in_list: int
 	:var place_in_resource: index in list resourceSpace.space[resource][index] where the individual is located
@@ -217,4 +216,11 @@ def generatePopulation( species, NoIndividuals ):
 		Individual = individual(species)
 		population.append(Individual)
 	return population
+		
+def Step(resourceSpace):
+	rdN = random.randint(0,len(resourceSpace.individuals))
+	rdNfloat = random.random()
+	if(rdNfloat < birthR_Probability):
+		
+	else:
 		
