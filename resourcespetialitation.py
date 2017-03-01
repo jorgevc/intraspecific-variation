@@ -17,6 +17,9 @@ class species:
 		:type id: int
 		:return: objet describing a species
 		:rtype: species
+		
+		:var meta_time: "Metabolic Time of the species" rate of events of the individuals of this species (birthR + deathR)
+		:vartype meta_time: float
 	"""
 	
 	def __init__(self, birthR,deadR,mainResource,ResourceSpecialization,id):
@@ -28,6 +31,7 @@ class species:
 		self.offset = mainResource - len(ResourceSpecialization)/2
 		self.distribution = np.array(ResourceSpecialization)
 		self.partition = self.makePartition(ResourceSpecialization)
+		self.meta_time = birthR + deadR
 
 	def bindSpecialitation(self,mainResource,ResourceSpecialization): #to deprecate ?
 		"""
@@ -67,6 +71,35 @@ class species:
 			partition.append(cumulative)
 		return np.array(partition)
 
+
+class individual:
+	"""
+	Represents a single individual
+	
+	:param species: the specie of the indiviudal to be instanced
+	:type species: species
+	:var resource: the resource specialitation of this individual
+	:vartype resource: int
+	:var species: Its species id
+	:vartype species: int
+	:var place_in_list: place (index) in the list resourceSpace.individuals
+	:vartype place_in_list: int
+	:var place_in_resource: index in list resourceSpace.space[resource][index] where the individual is located
+	:vartype place_in_resource: int
+	"""
+	
+	def __init__(self, species):
+		partLenght = len(species.partition)
+		rdN =random.uniform(0.0,species.partition[partLenght-1])
+		for i in xrange(partLenght):
+			if rdN <= species.partition[i]:
+				resource = i
+				break
+		resource = resource + species.offset
+		self.resource = resource
+		self.species = species
+		self.place_in_list = None
+		self.place_in_resource = None
 
 def gaussian( x, mu, var):
 	"""
@@ -111,7 +144,9 @@ class resourceSpace:
 	:var capacity: array indicating the maximun number of individuals allowed per resource
 	:vartype capacity: array[int]
 	:var individuals: Unordered list of individuals in the resource space
-	:vartype individuals: list[species]
+	:vartype individuals: list[individuals]
+	:var meta_time: "Metabolic Time of the comunity" Maximun rate of events MAX_OF_SPECIES(birthR + deathR)
+	:vartype meta_time: float
 	"""
 	
 	def __init__(self, NoResources):
@@ -119,6 +154,8 @@ class resourceSpace:
 		self.space = list([None] for i in xrange(NoResources) )
 		self.capacity = list(-1 for i in xrange(NoResources) )
 		self.individuals = []
+		self.meta_time = -1.0
+		self.aux = 0.0
 		
 	def InsertPopulation(self, Population ):
 		"""
@@ -144,6 +181,8 @@ class resourceSpace:
 			Individual.place_in_resource = len(self.space[Individual.resource])
 			self.individuals.append(Individual)
 			self.space[Individual.resource].append(Individual)
+			if(self.meta_time < Individual.species.meta_time):
+				self.meta_time = Individual.species.meta_time
 			
 	def KillIndividual(self, Individual):
 		"""
@@ -156,10 +195,19 @@ class resourceSpace:
 		:type Individual: individual
 		"""
 		
-		del self.space[Individual.resouce][Individual.place_in_resource]
-		del self.individuals[Individual.place_in_list]
+		LastInResource = self.space[Individual.resource].pop()
+		if not (LastInResource is Individual):
+			place = Individual.place_in_resource
+			LastInResource.place_in_resource = place
+			self.space[Individual.resource][place:(place + 1)] = [LastInResource]
+
+		LastInList = self.individuals.pop()
+		if not (LastInList is Individual):
+			place = Individual.place_in_list
+			LastInList.place_in_list = place
+			self.individuals[place:(place + 1)] = [LastInList]
 		
-	def bindResoucesCapacity(ResourcesCapacity):
+	def bindResoucesCapacity(self, ResourcesCapacity):
 		"""
 		Bind the array characterizing the capacity of each resource to the instance of resourceSpace
 		
@@ -170,34 +218,6 @@ class resourceSpace:
 		
 		self.capacity = np.array(ResourcesCapacity)
 				
-class individual:
-	"""
-	Represents a single individual
-	
-	:param species: the specie of the indiviudal to be instanced
-	:type species: species
-	:var resource: the resource specialitation of this individual
-	:vartype resource: int
-	:var species: Its species id
-	:vartype species: int
-	:var place_in_list: place (index) in the list resourceSpace.individuals
-	:vartype place_in_list: int
-	:var place_in_resource: index in list resourceSpace.space[resource][index] where the individual is located
-	:vartype place_in_resource: int
-	"""
-	
-	def __init__(self, species):
-		partLenght = len(species.partition)
-		rdN =random.uniform(0.0,species.partition[partLenght-1])
-		for i in xrange(partLenght):
-			if rdN <= species.partition[i]:
-				resource = i
-				break
-		resource = resource + species.offset
-		self.resource = resource
-		self.species = species.id
-		self.place_in_list = None
-		self.place_in_resource = None
 
 def generatePopulation( species, NoIndividuals ):
 	"""
@@ -216,11 +236,44 @@ def generatePopulation( species, NoIndividuals ):
 		Individual = individual(species)
 		population.append(Individual)
 	return population
+	
+#Dynamics
 		
 def Step(resourceSpace):
-	rdN = random.randint(0,len(resourceSpace.individuals))
+	"""
+    Evolve resourceSpace one computational step
+    with birth and dead rates of a randomly choosen individual
+    in resourceSpace
+    
+    :param resourceSpace: The system (resource space) to be updated
+    """
+    
+	rdN = random.randint(0,len(resourceSpace.individuals)-1)
+	Active_Individual = resourceSpace.individuals[rdN]
+	Active_Species = Active_Individual.species
 	rdNfloat = random.random()
-	if(rdNfloat < birthR_Probability):
+	birthR_Probability = Active_Species.birthR/resourceSpace.meta_time
+	deadR_Probability = Active_Species.deadR/resourceSpace.meta_time
+	if(rdNfloat < birthR_Probability): #new birth
+		newIndividual = individual(Active_Species)
+		resourceSpace.InsertIndividual(newIndividual)
+	elif(rdNfloat <= deadR_Probability + birthR_Probability ):  #death
+		resourceSpace.KillIndividual(Active_Individual)
 		
-	else:
-		
+def MCSweep(resourceSpace):
+    """
+    TODO
+    """
+    
+    updates = len(resourceSpace.individuals)
+    for i in xrange(updates):
+        Step(resourceSpace)
+        
+def Evolve(resourceSpace,Time):
+    """
+    Todo
+    """
+    
+    Sweeps = int(Time*resourceSpace.meta_time)
+    for i in xrange(Sweeps):
+        MCSweep(resourceSpace)
