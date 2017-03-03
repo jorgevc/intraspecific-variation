@@ -277,3 +277,8 @@ def Evolve(resourceSpace,Time):
     Sweeps = int(Time*resourceSpace.meta_time)
     for i in xrange(Sweeps):
         MCSweep(resourceSpace)
+
+#Auxiliaries
+def filterbyspecies(seq, species):
+    l = [el for el in seq if isinstance(el, individual) and el.species is species ]
+    return l
