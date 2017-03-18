@@ -1,5 +1,8 @@
 import numpy as np
 import random
+import os
+import dataset
+import json
 
 class species:
 	"""
@@ -22,17 +25,18 @@ class species:
 		:vartype meta_time: float
 	"""
 	
-	def __init__(self, birthR,deadR,mainResource,ResourceSpecialization,id):
+	def __init__(self, birthR,deadR,mainResource,ResourceSpecialization):
 		
-		self.id = id
+		self.id = None
 		self.birthR = birthR
 		self.deadR = deadR
-		self.ResourceSpecialization = self.bindSpecialitation(mainResource,ResourceSpecialization)
-		self.offset = mainResource - len(ResourceSpecialization)/2
-		self.distribution = np.array(ResourceSpecialization)
-		self.partition = self.makePartition(ResourceSpecialization)
+		self.ResourceSpecialization = self.bindSpecialitation(mainResource,ResourceSpecialization.dist)
+		self.offset = mainResource - len(ResourceSpecialization.dist)/2
+		self.distribution = ResourceSpecialization
+		self.partition = self.makePartition(np.array(ResourceSpecialization.dist))
 		self.meta_time = birthR + deadR
-
+		self.mainResource = mainResource
+	
 	def bindSpecialitation(self,mainResource,ResourceSpecialization): #to deprecate ?
 		"""
 		Relocates the resource spetialitation distribution to a absolute position
@@ -70,6 +74,23 @@ class species:
 			cumulative = partition[i-1] + ResourceSpecialization[i]
 			partition.append(cumulative)
 		return np.array(partition)
+		
+	def save(self,db,tableName='species'):
+		"""
+		Store the object to "table" in a SQLlite database if not stored previously
+		"""
+		table = db[tableName]
+		distribution_id=self.distribution.save(db)
+		args = dict(birthR=self.birthR, deadR=self.deadR, mainResource=self.mainResource, distribution_id=distribution_id)
+		
+		row = table.find_one(**args)
+		if (row==None):
+			row_id = table.insert(args)
+		else:
+			row_id = row["id"]
+			
+		self.id = row_id
+		return row_id
 
 
 class individual:
@@ -100,6 +121,38 @@ class individual:
 		self.species = species
 		self.place_in_list = None
 		self.place_in_resource = None
+		
+class distribution:
+	"""
+	Represents a distribution
+	"""
+	
+	def __init__(self, name, dist):
+		self.name=name
+		self.NoResources = len(dist)
+		self.moments = [np.sum(dist), np.mean(dist)]
+		self.dist=dist
+		self.id = None
+		
+	def save(self,db,tableName='distribution'):
+		"""
+		Store the object to "table" in a SQLlite database if not stored previously
+		"""
+		table = db[tableName]
+		
+		moments_list = []
+		for (i,),m in np.ndenumerate(self.moments):
+			moments_list.append( (str(int(i)) + ' moment' , m) )
+		
+		args = dict({'name': self.name, 'NoResources': self.NoResources})
+		args.update(dict(moments_list))
+		row = table.find_one(**args)
+		if (row==None):
+			row_id = table.insert(args)
+		else:
+			row_id = row["id"]
+		self.id = row_id
+		return row_id
 
 def gaussian( x, mu, var):
 	"""
@@ -114,7 +167,7 @@ def gaussian( x, mu, var):
 
 def gaussianSpecialization(NoResources,variance):
 	"""
-	Returns a np array representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.
+	Returns a "distribution" object representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.
 	
 	:param NoResources: Width of the distribution
 	:param variance: Variance of the gaussian distribution
@@ -127,7 +180,11 @@ def gaussianSpecialization(NoResources,variance):
 	for i in range(0,NoResources):
 		SpeciesResourceSpecialization[i] = (gaussian(i-0.5,mu,variance) + gaussian(i+0.5,mu,variance))/2.0
 	SpeciesResourceSpecialization = SpeciesResourceSpecialization/np.sum(SpeciesResourceSpecialization)
-	return SpeciesResourceSpecialization
+	Distribution = distribution("Gausssian", SpeciesResourceSpecialization)
+	Distribution.moments[1]=mu
+	Distribution.moments.append(variance)
+	Distribution.NoResources = NoResources
+	return Distribution
 
 class resourceSpace:
 	"""
@@ -152,10 +209,11 @@ class resourceSpace:
 	def __init__(self, NoResources):
 		self.NoResources = NoResources
 		self.space = list([None] for i in xrange(NoResources) )
-		self.capacity = list(-1 for i in xrange(NoResources) )
+		self.capacity = distribution('Unlimited', np.array(list(-1 for i in xrange(NoResources) )))
 		self.individuals = []
 		self.meta_time = -1.0
 		self.aux = 0.0
+		self.populations = []
 		
 	def InsertPopulation(self, Population ):
 		"""
@@ -164,7 +222,7 @@ class resourceSpace:
 		:param Population: The population to be inserted
 		:type Population: list[individual]
 		"""
-		
+		self.populations.append(Population)
 		for Individual in Population:
 			self.InsertIndividual(Individual)
 			
@@ -176,7 +234,7 @@ class resourceSpace:
 		:type Individual: individual
 		"""
 		
-		if (self.capacity[Individual.resource]<0 or len(self.space[Individual.resource]) < self.capacity[Individual.resource]):
+		if (self.capacity.dist[Individual.resource]<0 or len(self.space[Individual.resource]) < self.capacity.dist[Individual.resource]):
 			Individual.place_in_list = len(self.individuals)
 			Individual.place_in_resource = len(self.space[Individual.resource])
 			self.individuals.append(Individual)
@@ -216,7 +274,7 @@ class resourceSpace:
 		:type ResourcesCapacity: list(int) or numpy.array(int)
 		"""
 		
-		self.capacity = np.array(ResourcesCapacity)
+		self.capacity = ResourcesCapacity
 				
 
 def generatePopulation( species, NoIndividuals ):
@@ -236,6 +294,69 @@ def generatePopulation( species, NoIndividuals ):
 		Individual = individual(species)
 		population.append(Individual)
 	return population
+	
+class simulation:
+	"""
+	Class to save the simulation parameters to db
+	"""
+	def __init__(self, ResourceSpace):
+		self.NoResources = ResourceSpace.NoResources
+		self.capacity = ResourceSpace.capacity
+		self.populations = ResourceSpace.populations
+		self.duration = 0.0
+		self.populations_list = []
+		self.id = None
+		self.simulation_dir = None
+		self.ResourceSpace = ResourceSpace
+		
+	def save(self, storage='data', table_name='simulation'):
+		data_directory = './' + storage + '/'
+		if not os.path.exists(data_directory):
+			os.makedirs(data_directory)
+		
+		database_path = 'sqlite:///' + storage + '/IntraspecificVariation.sqlite'  
+		db = dataset.connect(database_path)
+		
+		for p in self.populations:
+			p[0].species.save(db)
+			if( (p[0].species.id, len(p) ) not in self.populations_list ):
+				self.populations_list.append( (p[0].species.id, len(p) ) )
+		self.populations_list.sort()
+		self.capacity.save(db)
+		simulation_param = dict({ 'NoResources' : self.NoResources, 'Capacity (distribution id)': self.capacity.id, 'initial_conditions': json.dumps(self.populations_list)})
+		simulationTable = db[table_name]
+		row = simulationTable.find_one(**simulation_param)
+		if (row==None):
+			simulation_param.update(dict({'duration': self.duration}))
+			self.id = simulationTable.insert(simulation_param)
+		else:
+			self.id = row['id']
+			if(float(row['duration'])<self.duration):
+				print 'hay que actualizar'
+				data = dict(id=row['id'], duration=self.duration)
+				simulationTable.update(data, ['id'])
+		self.simulation_dir = data_directory + str(self.id) + '/'
+		if not os.path.exists(self.simulation_dir):
+			os.makedirs(self.simulation_dir)
+		return self.id
+		
+	def dir(self):
+		if(self.simulation_dir != None):
+			return self.simulation_dir
+		else:
+			self.save()
+			return self.simulation_dir
+		
+	def evolve(self,Time):
+		"""
+		Todo
+		"""
+		
+		Sweeps = int(Time*self.ResourceSpace.meta_time)
+		for i in xrange(Sweeps):
+			MCSweep(self.ResourceSpace)
+		self.duration = self.duration + Time
+
 	
 #Dynamics
 		
@@ -269,14 +390,7 @@ def MCSweep(resourceSpace):
     for i in xrange(updates):
         Step(resourceSpace)
         
-def Evolve(resourceSpace,Time):
-    """
-    Todo
-    """
-    
-    Sweeps = int(Time*resourceSpace.meta_time)
-    for i in xrange(Sweeps):
-        MCSweep(resourceSpace)
+
 
 #Auxiliaries
 def filterbyspecies(seq, species):
