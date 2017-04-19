@@ -45,6 +45,9 @@
   <h1>Source code for resourcespetialitation</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">dataset</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <div class="viewcode-block" id="species"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.species">[docs]</a><span class="k">class</span> <span class="nc">species</span><span class="p">:</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -62,18 +65,23 @@
 <span class="sd">		:type id: int</span>
 <span class="sd">		:return: objet describing a species</span>
 <span class="sd">		:rtype: species</span>
+<span class="sd">		</span>
+<span class="sd">		:var meta_time: &quot;Metabolic Time of the species&quot; rate of events of the individuals of this species (birthR + deathR)</span>
+<span class="sd">		:vartype meta_time: float</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	
-	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">birthR</span><span class="p">,</span><span class="n">deadR</span><span class="p">,</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">,</span><span class="nb">id</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">birthR</span><span class="p">,</span><span class="n">deadR</span><span class="p">,</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">):</span>
 		
-		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">birthR</span> <span class="o">=</span> <span class="n">birthR</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">deadR</span> <span class="o">=</span> <span class="n">deadR</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">ResourceSpecialization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bindSpecialitation</span><span class="p">(</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">mainResource</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">distribution</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">partition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makePartition</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)</span>
-
+		<span class="bp">self</span><span class="o">.</span><span class="n">ResourceSpecialization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bindSpecialitation</span><span class="p">(</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="o">.</span><span class="n">dist</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">mainResource</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="o">.</span><span class="n">dist</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">distribution</span> <span class="o">=</span> <span class="n">ResourceSpecialization</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">partition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">makePartition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="o">.</span><span class="n">dist</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">meta_time</span> <span class="o">=</span> <span class="n">birthR</span> <span class="o">+</span> <span class="n">deadR</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">mainResource</span> <span class="o">=</span> <span class="n">mainResource</span>
+	
 <div class="viewcode-block" id="species.bindSpecialitation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.species.bindSpecialitation">[docs]</a>	<span class="k">def</span> <span class="nf">bindSpecialitation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">mainResource</span><span class="p">,</span><span class="n">ResourceSpecialization</span><span class="p">):</span> <span class="c1">#to deprecate ?</span>
 		<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">		Relocates the resource spetialitation distribution to a absolute position</span>
@@ -110,111 +118,26 @@
 		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ResourceSpecialization</span><span class="p">)):</span>
 			<span class="n">cumulative</span> <span class="o">=</span> <span class="n">partition</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">ResourceSpecialization</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 			<span class="n">partition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cumulative</span><span class="p">)</span>
-		<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">partition</span><span class="p">)</span></div></div>
-
-
-<div class="viewcode-block" id="gaussian"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.gaussian">[docs]</a><span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Returns the value of evaluating a gaussian `exp((x-mu)^{2}/2var^{2})`</span>
-<span class="sd">	</span>
-<span class="sd">	:type x: float</span>
-<span class="sd">	:type mu: float</span>
-<span class="sd">	:type var: float</span>
-<span class="sd">	:rtype: float</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)))</span></div>
-
-<div class="viewcode-block" id="gaussianSpecialization"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.gaussianSpecialization">[docs]</a><span class="k">def</span> <span class="nf">gaussianSpecialization</span><span class="p">(</span><span class="n">NoResources</span><span class="p">,</span><span class="n">variance</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Returns a np array representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.</span>
-<span class="sd">	</span>
-<span class="sd">	:param NoResources: Width of the distribution</span>
-<span class="sd">	:param variance: Variance of the gaussian distribution</span>
-<span class="sd">	:type NoResources: int</span>
-<span class="sd">	:type variance: float</span>
-<span class="sd">	:rtype: np array</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	<span class="n">SpeciesResourceSpecialization</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span>
-	<span class="n">mu</span> <span class="o">=</span> <span class="p">((</span><span class="n">NoResources</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span>
-	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">NoResources</span><span class="p">):</span>
-		<span class="n">SpeciesResourceSpecialization</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">variance</span><span class="p">)</span> <span class="o">+</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">variance</span><span class="p">))</span><span class="o">/</span><span class="mf">2.0</span>
-	<span class="n">SpeciesResourceSpecialization</span> <span class="o">=</span> <span class="n">SpeciesResourceSpecialization</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">SpeciesResourceSpecialization</span><span class="p">)</span>
-	<span class="k">return</span> <span class="n">SpeciesResourceSpecialization</span></div>
-
-<div class="viewcode-block" id="resourceSpace"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace">[docs]</a><span class="k">class</span> <span class="nc">resourceSpace</span><span class="p">:</span>
-	<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">	Represent the resource space where individuals are</span>
-<span class="sd">	</span>
-<span class="sd">	:param NoResources: Size of the space</span>
-<span class="sd">	:type NoResources: int</span>
-<span class="sd">	</span>
-<span class="sd">	:var NoResources: size of the resources space</span>
-<span class="sd">	:vartype NoResources: int</span>
-<span class="sd">	:var space: list of list. The position in the list represent the resource, the list there is a list</span>
-<span class="sd">	 of individuals with that specialization.</span>
-<span class="sd">	:vartype space: list[list[individual]]</span>
-<span class="sd">	:var capacity: array indicating the maximun number of individuals allowed per resource</span>
-<span class="sd">	:vartype capacity: array[int]</span>
-<span class="sd">	:var individuals: Unordered list of individuals in the resource space</span>
-<span class="sd">	:vartype individuals: list[species]</span>
-<span class="sd">	&quot;&quot;&quot;</span>
-	
-	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">NoResources</span><span class="p">):</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span> <span class="o">=</span> <span class="n">NoResources</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span> <span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span> <span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">partition</span><span class="p">)</span></div>
 		
-<div class="viewcode-block" id="resourceSpace.InsertPopulation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.InsertPopulation">[docs]</a>	<span class="k">def</span> <span class="nf">InsertPopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Population</span> <span class="p">):</span>
+<div class="viewcode-block" id="species.save"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.species.save">[docs]</a>	<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">db</span><span class="p">,</span><span class="n">tableName</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Inserts a Population in the resources space</span>
-<span class="sd">		</span>
-<span class="sd">		:param Population: The population to be inserted</span>
-<span class="sd">		:type Population: list[individual]</span>
+<span class="sd">		Store the object to &quot;table&quot; in a SQLlite database if not stored previously</span>
 <span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">table</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">tableName</span><span class="p">]</span>
+		<span class="n">distribution_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distribution</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+		<span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">birthR</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">birthR</span><span class="p">,</span> <span class="n">deadR</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">deadR</span><span class="p">,</span> <span class="n">mainResource</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mainResource</span><span class="p">,</span> <span class="n">distribution_id</span><span class="o">=</span><span class="n">distribution_id</span><span class="p">)</span>
 		
-		<span class="k">for</span> <span class="n">Individual</span> <span class="ow">in</span> <span class="n">Population</span><span class="p">:</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">InsertIndividual</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span></div>
+		<span class="n">row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="o">==</span><span class="kc">None</span><span class="p">):</span>
+			<span class="n">row_id</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">row_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
 			
-<div class="viewcode-block" id="resourceSpace.InsertIndividual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.InsertIndividual">[docs]</a>	<span class="k">def</span> <span class="nf">InsertIndividual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Individual</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Inserts an Individual in the resources space</span>
-<span class="sd">		</span>
-<span class="sd">		:param Individual: Individual to be inserted</span>
-<span class="sd">		:type Individual: individual</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		
-		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]):</span>
-			<span class="n">Individual</span><span class="o">.</span><span class="n">place_in_list</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">)</span>
-			<span class="n">Individual</span><span class="o">.</span><span class="n">place_in_resource</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">])</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span></div>
-			
-<div class="viewcode-block" id="resourceSpace.KillIndividual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.KillIndividual">[docs]</a>	<span class="k">def</span> <span class="nf">KillIndividual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Individual</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Eliminate the Individual from resource space.</span>
-<span class="sd">		The Individual should previously habe been inserted with InsertIndividual(Individual)</span>
-<span class="sd">		for this to work.</span>
-<span class="sd">		A list of the inserted Individuals is in self.individuals</span>
-<span class="sd">		</span>
-<span class="sd">		:param Individual: The individual to be eliminate</span>
-<span class="sd">		:type Individual: individual</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		
-		<span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resouce</span><span class="p">][</span><span class="n">Individual</span><span class="o">.</span><span class="n">place_in_resource</span><span class="p">]</span>
-		<span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">place_in_list</span><span class="p">]</span></div>
-		
-<div class="viewcode-block" id="resourceSpace.bindResoucesCapacity"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.bindResoucesCapacity">[docs]</a>	<span class="k">def</span> <span class="nf">bindResoucesCapacity</span><span class="p">(</span><span class="n">ResourcesCapacity</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		Bind the array characterizing the capacity of each resource to the instance of resourceSpace</span>
-<span class="sd">		</span>
-<span class="sd">		:param ResourcesCapacity: The array of capacities of the resources. Should be the same size or larger </span>
-<span class="sd">			than the size of the resource space size</span>
-<span class="sd">		:type ResourcesCapacity: list(int) or numpy.array(int)</span>
-<span class="sd">		&quot;&quot;&quot;</span>
-		
-		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ResourcesCapacity</span><span class="p">)</span></div></div>
-				
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">row_id</span>
+		<span class="k">return</span> <span class="n">row_id</span></div></div>
+
+
 <div class="viewcode-block" id="individual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.individual">[docs]</a><span class="k">class</span> <span class="nc">individual</span><span class="p">:</span>
 	<span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">	Represents a single individual</span>
@@ -240,9 +163,164 @@
 				<span class="k">break</span>
 		<span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span> <span class="o">+</span> <span class="n">species</span><span class="o">.</span><span class="n">offset</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">resource</span> <span class="o">=</span> <span class="n">resource</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">id</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">place_in_list</span> <span class="o">=</span> <span class="kc">None</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">place_in_resource</span> <span class="o">=</span> <span class="kc">None</span></div>
+		
+<div class="viewcode-block" id="distribution"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.distribution">[docs]</a><span class="k">class</span> <span class="nc">distribution</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Represents a distribution</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">name</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">moments</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dist</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dist</span><span class="p">)]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">dist</span><span class="o">=</span><span class="n">dist</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>
+		
+<div class="viewcode-block" id="distribution.save"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.distribution.save">[docs]</a>	<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">db</span><span class="p">,</span><span class="n">tableName</span><span class="o">=</span><span class="s1">&#39;distribution&#39;</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Store the object to &quot;table&quot; in a SQLlite database if not stored previously</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">table</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">tableName</span><span class="p">]</span>
+		
+		<span class="n">moments_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,),</span><span class="n">m</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndenumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">moments</span><span class="p">):</span>
+			<span class="n">moments_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; moment&#39;</span> <span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="p">)</span>
+		
+		<span class="n">args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;NoResources&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span><span class="p">})</span>
+		<span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">moments_list</span><span class="p">))</span>
+		<span class="n">row</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="o">==</span><span class="kc">None</span><span class="p">):</span>
+			<span class="n">row_id</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">row_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">row_id</span>
+		<span class="k">return</span> <span class="n">row_id</span></div></div>
+
+<div class="viewcode-block" id="gaussian"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.gaussian">[docs]</a><span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span> <span class="n">x</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Returns the value of evaluating a gaussian `exp((x-mu)^{2}/2var^{2})`</span>
+<span class="sd">	</span>
+<span class="sd">	:type x: float</span>
+<span class="sd">	:type mu: float</span>
+<span class="sd">	:type var: float</span>
+<span class="sd">	:rtype: float</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="mf">2.</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="gaussianSpecialization"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.gaussianSpecialization">[docs]</a><span class="k">def</span> <span class="nf">gaussianSpecialization</span><span class="p">(</span><span class="n">NoResources</span><span class="p">,</span><span class="n">variance</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Returns a &quot;distribution&quot; object representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.</span>
+<span class="sd">	</span>
+<span class="sd">	:param NoResources: Width of the distribution</span>
+<span class="sd">	:param variance: Variance of the gaussian distribution</span>
+<span class="sd">	:type NoResources: int</span>
+<span class="sd">	:type variance: float</span>
+<span class="sd">	:rtype: np array</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">SpeciesResourceSpecialization</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span>
+	<span class="n">mu</span> <span class="o">=</span> <span class="p">((</span><span class="n">NoResources</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">NoResources</span><span class="p">):</span>
+		<span class="n">SpeciesResourceSpecialization</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">variance</span><span class="p">)</span> <span class="o">+</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mf">0.5</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">variance</span><span class="p">))</span><span class="o">/</span><span class="mf">2.0</span>
+	<span class="n">SpeciesResourceSpecialization</span> <span class="o">=</span> <span class="n">SpeciesResourceSpecialization</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">SpeciesResourceSpecialization</span><span class="p">)</span>
+	<span class="n">Distribution</span> <span class="o">=</span> <span class="n">distribution</span><span class="p">(</span><span class="s2">&quot;Gausssian&quot;</span><span class="p">,</span> <span class="n">SpeciesResourceSpecialization</span><span class="p">)</span>
+	<span class="n">Distribution</span><span class="o">.</span><span class="n">moments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">mu</span>
+	<span class="n">Distribution</span><span class="o">.</span><span class="n">moments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variance</span><span class="p">)</span>
+	<span class="n">Distribution</span><span class="o">.</span><span class="n">NoResources</span> <span class="o">=</span> <span class="n">NoResources</span>
+	<span class="k">return</span> <span class="n">Distribution</span></div>
+
+<div class="viewcode-block" id="resourceSpace"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace">[docs]</a><span class="k">class</span> <span class="nc">resourceSpace</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Represent the resource space where individuals are</span>
+<span class="sd">	</span>
+<span class="sd">	:param NoResources: Size of the space</span>
+<span class="sd">	:type NoResources: int</span>
+<span class="sd">	</span>
+<span class="sd">	:var NoResources: size of the resources space</span>
+<span class="sd">	:vartype NoResources: int</span>
+<span class="sd">	:var space: list of list. The position in the list represent the resource, the list there is a list</span>
+<span class="sd">	 of individuals with that specialization.</span>
+<span class="sd">	:vartype space: list[list[individual]]</span>
+<span class="sd">	:var capacity: array indicating the maximun number of individuals allowed per resource</span>
+<span class="sd">	:vartype capacity: array[int]</span>
+<span class="sd">	:var individuals: Unordered list of individuals in the resource space</span>
+<span class="sd">	:vartype individuals: list[individuals]</span>
+<span class="sd">	:var meta_time: &quot;Metabolic Time of the comunity&quot; Maximun rate of events MAX_OF_SPECIES(birthR + deathR)</span>
+<span class="sd">	:vartype meta_time: float</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">NoResources</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span> <span class="o">=</span> <span class="n">NoResources</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">distribution</span><span class="p">(</span><span class="s1">&#39;Unlimited&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">NoResources</span><span class="p">)</span> <span class="p">)))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">meta_time</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">aux</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">populations</span> <span class="o">=</span> <span class="p">[]</span>
+		
+<div class="viewcode-block" id="resourceSpace.InsertPopulation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.InsertPopulation">[docs]</a>	<span class="k">def</span> <span class="nf">InsertPopulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Population</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Inserts a Population in the resources space</span>
+<span class="sd">		</span>
+<span class="sd">		:param Population: The population to be inserted</span>
+<span class="sd">		:type Population: list[individual]</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Population</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">Individual</span> <span class="ow">in</span> <span class="n">Population</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">InsertIndividual</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span></div>
+			
+<div class="viewcode-block" id="resourceSpace.InsertIndividual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.InsertIndividual">[docs]</a>	<span class="k">def</span> <span class="nf">InsertIndividual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Individual</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Inserts an Individual in the resources space</span>
+<span class="sd">		</span>
+<span class="sd">		:param Individual: Individual to be inserted</span>
+<span class="sd">		:type Individual: individual</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="o">.</span><span class="n">dist</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">])</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="o">.</span><span class="n">dist</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]):</span>
+			<span class="n">Individual</span><span class="o">.</span><span class="n">place_in_list</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">)</span>
+			<span class="n">Individual</span><span class="o">.</span><span class="n">place_in_resource</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">])</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span>
+			<span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_time</span> <span class="o">&lt;</span> <span class="n">Individual</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">meta_time</span><span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">meta_time</span> <span class="o">=</span> <span class="n">Individual</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">meta_time</span></div>
+			
+<div class="viewcode-block" id="resourceSpace.KillIndividual"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.KillIndividual">[docs]</a>	<span class="k">def</span> <span class="nf">KillIndividual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Individual</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Eliminate the Individual from resource space.</span>
+<span class="sd">		The Individual should previously habe been inserted with InsertIndividual(Individual)</span>
+<span class="sd">		for this to work.</span>
+<span class="sd">		A list of the inserted Individuals is in self.individuals</span>
+<span class="sd">		</span>
+<span class="sd">		:param Individual: The individual to be eliminate</span>
+<span class="sd">		:type Individual: individual</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="n">LastInResource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">LastInResource</span> <span class="ow">is</span> <span class="n">Individual</span><span class="p">):</span>
+			<span class="n">place</span> <span class="o">=</span> <span class="n">Individual</span><span class="o">.</span><span class="n">place_in_resource</span>
+			<span class="n">LastInResource</span><span class="o">.</span><span class="n">place_in_resource</span> <span class="o">=</span> <span class="n">place</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">space</span><span class="p">[</span><span class="n">Individual</span><span class="o">.</span><span class="n">resource</span><span class="p">][</span><span class="n">place</span><span class="p">:(</span><span class="n">place</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">LastInResource</span><span class="p">]</span>
+
+		<span class="n">LastInList</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">LastInList</span> <span class="ow">is</span> <span class="n">Individual</span><span class="p">):</span>
+			<span class="n">place</span> <span class="o">=</span> <span class="n">Individual</span><span class="o">.</span><span class="n">place_in_list</span>
+			<span class="n">LastInList</span><span class="o">.</span><span class="n">place_in_list</span> <span class="o">=</span> <span class="n">place</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">place</span><span class="p">:(</span><span class="n">place</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">LastInList</span><span class="p">]</span></div>
+		
+<div class="viewcode-block" id="resourceSpace.bindResoucesCapacity"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.resourceSpace.bindResoucesCapacity">[docs]</a>	<span class="k">def</span> <span class="nf">bindResoucesCapacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ResourcesCapacity</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Bind the array characterizing the capacity of each resource to the instance of resourceSpace</span>
+<span class="sd">		</span>
+<span class="sd">		:param ResourcesCapacity: The array of capacities of the resources. Should be the same size or larger </span>
+<span class="sd">			than the size of the resource space size</span>
+<span class="sd">		:type ResourcesCapacity: list(int) or numpy.array(int)</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">ResourcesCapacity</span></div></div>
+				
 
 <div class="viewcode-block" id="generatePopulation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.generatePopulation">[docs]</a><span class="k">def</span> <span class="nf">generatePopulation</span><span class="p">(</span> <span class="n">species</span><span class="p">,</span> <span class="n">NoIndividuals</span> <span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot;</span>
@@ -261,7 +339,108 @@
 		<span class="n">Individual</span> <span class="o">=</span> <span class="n">individual</span><span class="p">(</span><span class="n">species</span><span class="p">)</span>
 		<span class="n">population</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Individual</span><span class="p">)</span>
 	<span class="k">return</span> <span class="n">population</span></div>
+	
+<div class="viewcode-block" id="simulation"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.simulation">[docs]</a><span class="k">class</span> <span class="nc">simulation</span><span class="p">:</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Class to save the simulation parameters to db</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ResourceSpace</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span> <span class="o">=</span> <span class="n">ResourceSpace</span><span class="o">.</span><span class="n">NoResources</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span> <span class="o">=</span> <span class="n">ResourceSpace</span><span class="o">.</span><span class="n">capacity</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">populations</span> <span class="o">=</span> <span class="n">ResourceSpace</span><span class="o">.</span><span class="n">populations</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">populations_list</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span> <span class="o">=</span> <span class="kc">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ResourceSpace</span> <span class="o">=</span> <span class="n">ResourceSpace</span>
 		
+<div class="viewcode-block" id="simulation.save"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.simulation.save">[docs]</a>	<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">storage</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="s1">&#39;simulation&#39;</span><span class="p">):</span>
+		<span class="n">data_directory</span> <span class="o">=</span> <span class="s1">&#39;./&#39;</span> <span class="o">+</span> <span class="n">storage</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">data_directory</span><span class="p">):</span>
+			<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">data_directory</span><span class="p">)</span>
+		
+		<span class="n">database_path</span> <span class="o">=</span> <span class="s1">&#39;sqlite:///&#39;</span> <span class="o">+</span> <span class="n">storage</span> <span class="o">+</span> <span class="s1">&#39;/IntraspecificVariation.sqlite&#39;</span>  
+		<span class="n">db</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database_path</span><span class="p">)</span>
+		
+		<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations</span><span class="p">:</span>
+			<span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+			<span class="k">if</span><span class="p">(</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">populations_list</span> <span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">populations_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">populations_list</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+		<span class="n">simulation_param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span> <span class="s1">&#39;NoResources&#39;</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">NoResources</span><span class="p">,</span> <span class="s1">&#39;Capacity (distribution id)&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">capacity</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;initial_conditions&#39;</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">populations_list</span><span class="p">)})</span>
+		<span class="n">simulationTable</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
+		<span class="n">row</span> <span class="o">=</span> <span class="n">simulationTable</span><span class="o">.</span><span class="n">find_one</span><span class="p">(</span><span class="o">**</span><span class="n">simulation_param</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">row</span><span class="o">==</span><span class="kc">None</span><span class="p">):</span>
+			<span class="n">simulation_param</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">({</span><span class="s1">&#39;duration&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">}))</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">simulationTable</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">simulation_param</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+			<span class="k">if</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span><span class="o">&lt;</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">):</span>
+				<span class="nb">print</span> <span class="s1">&#39;hay que actualizar&#39;</span>
+				<span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
+				<span class="n">simulationTable</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span> <span class="o">=</span> <span class="n">data_directory</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+		<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span><span class="p">):</span>
+			<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span><span class="p">)</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+		
+<div class="viewcode-block" id="simulation.dir"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.simulation.dir">[docs]</a>	<span class="k">def</span> <span class="nf">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">if</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+			<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_dir</span></div>
+		
+<div class="viewcode-block" id="simulation.evolve"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.simulation.evolve">[docs]</a>	<span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">Time</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Todo</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		
+		<span class="n">Sweeps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Time</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ResourceSpace</span><span class="o">.</span><span class="n">meta_time</span><span class="p">)</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">Sweeps</span><span class="p">):</span>
+			<span class="n">MCSweep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ResourceSpace</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">+</span> <span class="n">Time</span></div></div>
+
+	
+<span class="c1">#Dynamics</span>
+		
+<div class="viewcode-block" id="Step"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.Step">[docs]</a><span class="k">def</span> <span class="nf">Step</span><span class="p">(</span><span class="n">resourceSpace</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evolve resourceSpace one computational step</span>
+<span class="sd">    with birth and dead rates of a randomly choosen individual</span>
+<span class="sd">    in resourceSpace</span>
+<span class="sd">    </span>
+<span class="sd">    :param resourceSpace: The system (resource space) to be updated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+	<span class="n">rdN</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">resourceSpace</span><span class="o">.</span><span class="n">individuals</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+	<span class="n">Active_Individual</span> <span class="o">=</span> <span class="n">resourceSpace</span><span class="o">.</span><span class="n">individuals</span><span class="p">[</span><span class="n">rdN</span><span class="p">]</span>
+	<span class="n">Active_Species</span> <span class="o">=</span> <span class="n">Active_Individual</span><span class="o">.</span><span class="n">species</span>
+	<span class="n">rdNfloat</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+	<span class="n">birthR_Probability</span> <span class="o">=</span> <span class="n">Active_Species</span><span class="o">.</span><span class="n">birthR</span><span class="o">/</span><span class="n">resourceSpace</span><span class="o">.</span><span class="n">meta_time</span>
+	<span class="n">deadR_Probability</span> <span class="o">=</span> <span class="n">Active_Species</span><span class="o">.</span><span class="n">deadR</span><span class="o">/</span><span class="n">resourceSpace</span><span class="o">.</span><span class="n">meta_time</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">rdNfloat</span> <span class="o">&lt;</span> <span class="n">birthR_Probability</span><span class="p">):</span> <span class="c1">#new birth</span>
+		<span class="n">newIndividual</span> <span class="o">=</span> <span class="n">individual</span><span class="p">(</span><span class="n">Active_Species</span><span class="p">)</span>
+		<span class="n">resourceSpace</span><span class="o">.</span><span class="n">InsertIndividual</span><span class="p">(</span><span class="n">newIndividual</span><span class="p">)</span>
+	<span class="k">elif</span><span class="p">(</span><span class="n">rdNfloat</span> <span class="o">&lt;=</span> <span class="n">deadR_Probability</span> <span class="o">+</span> <span class="n">birthR_Probability</span> <span class="p">):</span>  <span class="c1">#death</span>
+		<span class="n">resourceSpace</span><span class="o">.</span><span class="n">KillIndividual</span><span class="p">(</span><span class="n">Active_Individual</span><span class="p">)</span></div>
+		
+<div class="viewcode-block" id="MCSweep"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.MCSweep">[docs]</a><span class="k">def</span> <span class="nf">MCSweep</span><span class="p">(</span><span class="n">resourceSpace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TODO</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">updates</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">resourceSpace</span><span class="o">.</span><span class="n">individuals</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">xrange</span><span class="p">(</span><span class="n">updates</span><span class="p">):</span>
+        <span class="n">Step</span><span class="p">(</span><span class="n">resourceSpace</span><span class="p">)</span></div>
+        
+
+
+<span class="c1">#Auxiliaries</span>
+<div class="viewcode-block" id="filterbyspecies"><a class="viewcode-back" href="../resourcespetialitation.html#resourcespetialitation.filterbyspecies">[docs]</a><span class="k">def</span> <span class="nf">filterbyspecies</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">species</span><span class="p">):</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">seq</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">el</span><span class="p">,</span> <span class="n">individual</span><span class="p">)</span> <span class="ow">and</span> <span class="n">el</span><span class="o">.</span><span class="n">species</span> <span class="ow">is</span> <span class="n">species</span> <span class="p">]</span>
+    <span class="k">return</span> <span class="n">l</span></div>
 </pre></div>
 
           </div>

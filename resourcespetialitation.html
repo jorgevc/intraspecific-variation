@@ -46,6 +46,45 @@
   <div class="section" id="module-resourcespetialitation">
 <span id="resourcespetialitation-module"></span><h1>resourcespetialitation module<a class="headerlink" href="#module-resourcespetialitation" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
+<dt id="resourcespetialitation.MCSweep">
+<code class="descclassname">resourcespetialitation.</code><code class="descname">MCSweep</code><span class="sig-paren">(</span><em>resourceSpace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#MCSweep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.MCSweep" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="resourcespetialitation.Step">
+<code class="descclassname">resourcespetialitation.</code><code class="descname">Step</code><span class="sig-paren">(</span><em>resourceSpace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#Step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.Step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evolve resourceSpace one computational step
+with birth and dead rates of a randomly choosen individual
+in resourceSpace</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resourceSpace</strong> &#8211; The system (resource space) to be updated</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="resourcespetialitation.distribution">
+<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">distribution</code><span class="sig-paren">(</span><em>name</em>, <em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Represents a distribution</p>
+<dl class="method">
+<dt id="resourcespetialitation.distribution.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>db</em>, <em>tableName='distribution'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#distribution.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.distribution.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the object to &#8220;table&#8221; in a SQLlite database if not stored previously</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="resourcespetialitation.filterbyspecies">
+<code class="descclassname">resourcespetialitation.</code><code class="descname">filterbyspecies</code><span class="sig-paren">(</span><em>seq</em>, <em>species</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#filterbyspecies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.filterbyspecies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
 <dt id="resourcespetialitation.gaussian">
 <code class="descclassname">resourcespetialitation.</code><code class="descname">gaussian</code><span class="sig-paren">(</span><em>x</em>, <em>mu</em>, <em>var</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.gaussian" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the value of evaluating a gaussian <cite>exp((x-mu)^{2}/2var^{2})</cite></p>
@@ -62,7 +101,7 @@
 <dl class="function">
 <dt id="resourcespetialitation.gaussianSpecialization">
 <code class="descclassname">resourcespetialitation.</code><code class="descname">gaussianSpecialization</code><span class="sig-paren">(</span><em>NoResources</em>, <em>variance</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#gaussianSpecialization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.gaussianSpecialization" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a np array representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.</p>
+<dd><p>Returns a &#8220;distribution&#8221; object representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -143,7 +182,8 @@
 <li><strong>space</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference internal" href="#resourcespetialitation.individual" title="resourcespetialitation.individual"><em>individual</em></a><em>]</em><em></em><em>]</em><em></em>) &#8211; list of list. The position in the list represent the resource, the list there is a list
 of individuals with that specialization.</li>
 <li><strong>capacity</strong> (<a class="reference external" href="https://docs.python.org/2/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a><em>[</em><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>]</em><em></em>) &#8211; array indicating the maximun number of individuals allowed per resource</li>
-<li><strong>individuals</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><a class="reference internal" href="#resourcespetialitation.species" title="resourcespetialitation.species"><em>species</em></a><em>]</em><em></em>) &#8211; Unordered list of individuals in the resource space</li>
+<li><strong>individuals</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a><em>[</em><em>individuals</em><em>]</em><em></em>) &#8211; Unordered list of individuals in the resource space</li>
+<li><strong>meta_time</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; &#8220;Metabolic Time of the comunity&#8221; Maximun rate of events MAX_OF_SPECIES(birthR + deathR)</li>
 </ul>
 </td>
 </tr>
@@ -212,8 +252,30 @@ than the size of the resource space size</td>
 </dd></dl>
 
 <dl class="class">
+<dt id="resourcespetialitation.simulation">
+<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">simulation</code><span class="sig-paren">(</span><em>ResourceSpace</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#simulation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.simulation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to save the simulation parameters to db</p>
+<dl class="method">
+<dt id="resourcespetialitation.simulation.dir">
+<code class="descname">dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#simulation.dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.simulation.dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.simulation.evolve">
+<code class="descname">evolve</code><span class="sig-paren">(</span><em>Time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#simulation.evolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.simulation.evolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Todo</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.simulation.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>storage='data'</em>, <em>table_name='simulation'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#simulation.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.simulation.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="resourcespetialitation.species">
-<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">species</code><span class="sig-paren">(</span><em>birthR</em>, <em>deadR</em>, <em>mainResource</em>, <em>ResourceSpecialization</em>, <em>id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.species" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">resourcespetialitation.</code><code class="descname">species</code><span class="sig-paren">(</span><em>birthR</em>, <em>deadR</em>, <em>mainResource</em>, <em>ResourceSpecialization</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.species" title="Permalink to this definition">¶</a></dt>
 <dd><p>Represents a species</p>
 <blockquote>
 <div><table class="docutils field-list" frame="void" rules="none">
@@ -247,6 +309,11 @@ than the size of the resource space size</td>
 <tr class="field-odd field"><th class="field-name">return:</th><td class="field-body">objet describing a species</td>
 </tr>
 <tr class="field-even field"><th class="field-name">rtype:</th><td class="field-body">species</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">var meta_time:</th><td class="field-body">&#8220;Metabolic Time of the species&#8221; rate of events of the individuals of this species (birthR + deathR)</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">vartype meta_time:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">float</td>
 </tr>
 </tbody>
 </table>
@@ -292,6 +359,12 @@ where the mainResource is in the center of the distribution given by Resourcespe
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="resourcespetialitation.species.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>db</em>, <em>tableName='species'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/resourcespetialitation.html#species.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#resourcespetialitation.species.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the object to &#8220;table&#8221; in a SQLlite database if not stored previously</p>
 </dd></dl>
 
 </dd></dl>
