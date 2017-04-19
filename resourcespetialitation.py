@@ -15,7 +15,7 @@ class species:
 		:param id: id of the specie
 		:type birthR: float
 		:type deadR: float
-		:type mainResource: int
+		:type mainResource: int (resource of the middle of the distribution)
 		:type ResourceSpecialization: array[float]
 		:type id: int
 		:return: objet describing a species
@@ -167,7 +167,7 @@ def gaussian( x, mu, var):
 
 def gaussianSpecialization(NoResources,variance):
 	"""
-	Returns a "distribution" object representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.
+	Returns a "distribution" object representing a discreate distribution of the specialization variation of a species. Of gaussian shape.
 	
 	:param NoResources: Width of the distribution
 	:param variance: Variance of the gaussian distribution
@@ -181,6 +181,27 @@ def gaussianSpecialization(NoResources,variance):
 		SpeciesResourceSpecialization[i] = (gaussian(i-0.5,mu,variance) + gaussian(i+0.5,mu,variance))/2.0
 	SpeciesResourceSpecialization = SpeciesResourceSpecialization/np.sum(SpeciesResourceSpecialization)
 	Distribution = distribution("Gausssian", SpeciesResourceSpecialization)
+	Distribution.moments[1]=mu
+	Distribution.moments.append(variance)
+	Distribution.NoResources = NoResources
+	return Distribution
+	
+def uncenteredGaussian(NoResources,variance,offset):
+	"""
+	Returns a "distribution" object representing a discreate distribution of the spacialization variation of a species. Of gaussian shape.
+	
+	:param NoResources: Width of the distribution
+	:param variance: Variance of the gaussian distribution
+	:type NoResources: int
+	:type variance: float
+	:rtype: np array
+	"""
+	SpeciesResourceSpecialization = np.zeros(NoResources)
+	mu = (((NoResources+offset)/2.0) + 0.5) - 1.0
+	for i in range(0,NoResources):
+		SpeciesResourceSpecialization[i] = (gaussian(i-0.5,mu,variance) + gaussian(i+0.5,mu,variance))/2.0
+	SpeciesResourceSpecialization = SpeciesResourceSpecialization/np.sum(SpeciesResourceSpecialization)
+	Distribution = distribution("uncenteredGausssian (offset=" + str(offset)+")", SpeciesResourceSpecialization)
 	Distribution.moments[1]=mu
 	Distribution.moments.append(variance)
 	Distribution.NoResources = NoResources
@@ -355,6 +376,8 @@ class simulation:
 		Sweeps = int(Time*self.ResourceSpace.meta_time)
 		for i in xrange(Sweeps):
 			MCSweep(self.ResourceSpace)
+		modulus = Time*self.ResourceSpace.meta_time % 1
+		MCSweep(self.ResourceSpace,modulus)
 		self.duration = self.duration + Time
 
 	
@@ -381,12 +404,12 @@ def Step(resourceSpace):
 	elif(rdNfloat <= deadR_Probability + birthR_Probability ):  #death
 		resourceSpace.KillIndividual(Active_Individual)
 		
-def MCSweep(resourceSpace):
+def MCSweep(resourceSpace, times=1.0):
     """
     TODO
     """
     
-    updates = len(resourceSpace.individuals)
+    updates = int(times*len(resourceSpace.individuals))
     for i in xrange(updates):
         Step(resourceSpace)
         
@@ -396,3 +419,6 @@ def MCSweep(resourceSpace):
 def filterbyspecies(seq, species):
     l = [el for el in seq if isinstance(el, individual) and el.species is species ]
     return l
+
+#Dinamically Niche Evolution
+
